@@ -103,7 +103,7 @@ router.post('/', auth, async (req, res) => {
     const post = await Post.create({
       title,
       content,
-      userId: req.user.id
+      user_id: req.user.id
     });
 
     res.status(201).json(post);
@@ -266,7 +266,7 @@ router.put('/:id', auth, async (req, res) => {
     }
 
     // Check if user is the author
-    if (post.userId !== req.user.id) {
+    if (post.user_id !== req.user.id) {
       return res.status(403).json({ message: 'Not authorized to update this post' });
     }
 
@@ -312,7 +312,7 @@ router.delete('/:id', auth, async (req, res) => {
     }
 
     // Check if user is the author
-    if (post.userId !== req.user.id) {
+    if (post.user_id !== req.user.id) {
       return res.status(403).json({ message: 'Not authorized to delete this post' });
     }
 

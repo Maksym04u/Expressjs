@@ -32,6 +32,7 @@ const User = sequelize.define('User', {
     }
   }
 }, {
+  tableName: 'Users',
   timestamps: true,
   hooks: {
     beforeCreate: async (user) => {

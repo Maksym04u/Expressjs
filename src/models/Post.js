@@ -1,6 +1,5 @@
 const { DataTypes } = require('sequelize');
 const sequelize = require('../config/database');
-const User = require('./User');
 
 const Post = sequelize.define('Post', {
   id: {
@@ -21,13 +20,18 @@ const Post = sequelize.define('Post', {
     validate: {
       notEmpty: true
     }
+  },
+  user_id: {
+    type: DataTypes.INTEGER,
+    allowNull: false,
+    references: {
+      model: 'Users',
+      key: 'id'
+    }
   }
 }, {
+  tableName: 'Posts',
   timestamps: true
 });
-
-// Define the relationship
-Post.belongsTo(User, { as: 'author', foreignKey: 'authorId' });
-User.hasMany(Post, { foreignKey: 'authorId' });
 
 module.exports = Post; 

@@ -23,6 +23,12 @@ const options = {
         },
       },
     },
+    tags: [
+      {
+        name: 'Raw SQL',
+        description: 'Endpoints using raw SQL queries'
+      }
+    ]
   },
   apis: ['./src/routes/*.js'], // Path to the API routes
 };
