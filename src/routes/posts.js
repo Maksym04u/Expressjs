@@ -10,61 +10,15 @@ const { Op } = require('sequelize');
  *   schemas:
  *     Post:
  *       type: object
- *       required:
- *         - title
- *         - content
  *       properties:
- *         id:
- *           type: integer
- *           description: The auto-generated id of the post
- *         title:
- *           type: string
- *           description: The title of the post
- *         content:
- *           type: string
- *           description: The content of the post
- *         userId:
- *           type: integer
- *           description: The ID of the author
- *         createdAt:
- *           type: string
- *           format: date-time
- *           description: The date the post was created
- *         updatedAt:
- *           type: string
- *           format: date-time
- *           description: The date the post was last updated
- *         author:
+ *         id: { type: integer }
+ *         title: { type: string }
+ *         content: { type: string }
+ *         user_id: { type: integer }
+ *         author: 
  *           type: object
  *           properties:
- *             username:
- *               type: string
- *               description: The username of the post author
- *     PaginatedPosts:
- *       type: object
- *       properties:
- *         posts:
- *           type: array
- *           items:
- *             $ref: '#/components/schemas/Post'
- *         pagination:
- *           type: object
- *           properties:
- *             currentPage:
- *               type: integer
- *               description: Current page number
- *             totalPages:
- *               type: integer
- *               description: Total number of pages
- *             totalPosts:
- *               type: integer
- *               description: Total number of posts
- *             hasNextPage:
- *               type: boolean
- *               description: Whether there is a next page
- *             hasPreviousPage:
- *               type: boolean
- *               description: Whether there is a previous page
+ *             username: { type: string }
  */
 
 /**
@@ -81,21 +35,13 @@ const { Op } = require('sequelize');
  *         application/json:
  *           schema:
  *             type: object
- *             required:
- *               - title
- *               - content
  *             properties:
- *               title:
- *                 type: string
- *               content:
- *                 type: string
+ *               title: { type: string }
+ *               content: { type: string }
  *     responses:
- *       201:
- *         description: Post created successfully
- *       401:
- *         description: Not authorized
- *       500:
- *         description: Server error
+ *       201: { description: Post created successfully }
+ *       401: { description: Not authorized }
+ *       500: { description: Server error }
  */
 router.post('/', auth, async (req, res) => {
   try {
@@ -121,28 +67,13 @@ router.post('/', auth, async (req, res) => {
  *     parameters:
  *       - in: query
  *         name: page
- *         schema:
- *           type: integer
- *           minimum: 1
- *           default: 1
- *         description: Page number
+ *         schema: { type: integer, default: 1 }
  *       - in: query
  *         name: limit
- *         schema:
- *           type: integer
- *           minimum: 1
- *           maximum: 50
- *           default: 5
- *         description: Number of posts per page
+ *         schema: { type: integer, default: 5 }
  *     responses:
- *       200:
- *         description: List of posts with pagination info
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/components/schemas/PaginatedPosts'
- *       500:
- *         description: Server error
+ *       200: { description: List of posts }
+ *       500: { description: Server error }
  */
 router.get('/', async (req, res) => {
   try {
@@ -150,11 +81,9 @@ router.get('/', async (req, res) => {
     const limit = parseInt(req.query.limit) || 5;
     const offset = (page - 1) * limit;
 
-    // Get total count of posts
     const totalPosts = await Post.count();
     const totalPages = Math.ceil(totalPosts / limit);
 
-    // Get posts for current page
     const posts = await Post.findAll({
       include: [{
         model: User,
@@ -163,7 +92,7 @@ router.get('/', async (req, res) => {
       }],
       limit,
       offset,
-      order: [['createdAt', 'DESC']] // Sort by newest first
+      order: [['createdAt', 'DESC']]
     });
 
     res.json({
@@ -190,17 +119,11 @@ router.get('/', async (req, res) => {
  *     parameters:
  *       - in: path
  *         name: id
- *         schema:
- *           type: integer
  *         required: true
- *         description: Post ID
+ *         schema: { type: integer }
  *     responses:
- *       200:
- *         description: Post found
- *       404:
- *         description: Post not found
- *       500:
- *         description: Server error
+ *       200: { description: Post found }
+ *       404: { description: Post not found }
  */
 router.get('/:id', async (req, res) => {
   try {
@@ -231,32 +154,21 @@ router.get('/:id', async (req, res) => {
  *     parameters:
  *       - in: path
  *         name: id
- *         schema:
- *           type: integer
  *         required: true
- *         description: Post ID
+ *         schema: { type: integer }
  *     requestBody:
- *       required: true
  *       content:
  *         application/json:
  *           schema:
  *             type: object
  *             properties:
- *               title:
- *                 type: string
- *               content:
- *                 type: string
+ *               title: { type: string }
+ *               content: { type: string }
  *     responses:
- *       200:
- *         description: Post updated successfully
- *       401:
- *         description: Not authorized
- *       403:
- *         description: Not authorized to update this post
- *       404:
- *         description: Post not found
- *       500:
- *         description: Server error
+ *       200: { description: Post updated }
+ *       401: { description: Not authorized }
+ *       403: { description: Not authorized to update }
+ *       404: { description: Post not found }
  */
 router.put('/:id', auth, async (req, res) => {
   try {
@@ -265,7 +177,6 @@ router.put('/:id', auth, async (req, res) => {
       return res.status(404).json({ message: 'Post not found' });
     }
 
-    // Check if user is the author
     if (post.user_id !== req.user.id) {
       return res.status(403).json({ message: 'Not authorized to update this post' });
     }
@@ -288,21 +199,13 @@ router.put('/:id', auth, async (req, res) => {
  *     parameters:
  *       - in: path
  *         name: id
- *         schema:
- *           type: integer
  *         required: true
- *         description: Post ID
+ *         schema: { type: integer }
  *     responses:
- *       200:
- *         description: Post deleted successfully
- *       401:
- *         description: Not authorized
- *       403:
- *         description: Not authorized to delete this post
- *       404:
- *         description: Post not found
- *       500:
- *         description: Server error
+ *       200: { description: Post deleted }
+ *       401: { description: Not authorized }
+ *       403: { description: Not authorized to delete }
+ *       404: { description: Post not found }
  */
 router.delete('/:id', auth, async (req, res) => {
   try {
@@ -311,7 +214,6 @@ router.delete('/:id', auth, async (req, res) => {
       return res.status(404).json({ message: 'Post not found' });
     }
 
-    // Check if user is the author
     if (post.user_id !== req.user.id) {
       return res.status(403).json({ message: 'Not authorized to delete this post' });
     }
