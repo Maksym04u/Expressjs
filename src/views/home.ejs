@@ -1,0 +1,58 @@
+<div class="row">
+    <div class="col-md-8">
+        <h1>Recent Posts</h1>
+        <% if (posts.length === 0) { %>
+            <p>No posts yet.</p>
+        <% } else { %>
+            <% posts.forEach(post => { %>
+                <div class="card mb-3">
+                    <div class="card-body">
+                        <h5 class="card-title"><%= post.title %></h5>
+                        <h6 class="card-subtitle mb-2 text-muted">
+                            By <%= post.author.username %> on <%= new Date(post.createdAt).toLocaleDateString() %>
+                        </h6>
+                        <p class="card-text"><%= post.content %></p>
+                        <% if (locals.user && post.user_id === user.id) { %>
+                            <div class="btn-group">
+                                <a href="/posts/<%= post.id %>/edit" class="btn btn-sm btn-outline-primary">Edit</a>
+                                <form action="/api/posts/<%= post.id %>" method="POST" class="d-inline">
+                                    <input type="hidden" name="_method" value="DELETE">
+                                    <button type="submit" class="btn btn-sm btn-outline-danger">Delete</button>
+                                </form>
+                            </div>
+                        <% } %>
+                    </div>
+                </div>
+            <% }); %>
+        <% } %>
+    </div>
+    <div class="col-md-4">
+        <% if (locals.user) { %>
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Create New Post</h5>
+                    <form action="/api/posts" method="POST">
+                        <div class="mb-3">
+                            <label for="title" class="form-label">Title</label>
+                            <input type="text" class="form-control" id="title" name="title" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="content" class="form-label">Content</label>
+                            <textarea class="form-control" id="content" name="content" rows="3" required></textarea>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Post</button>
+                    </form>
+                </div>
+            </div>
+        <% } else { %>
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Welcome!</h5>
+                    <p class="card-text">Please log in to create posts.</p>
+                    <a href="/login" class="btn btn-primary">Login</a>
+                    <a href="/register" class="btn btn-outline-primary">Register</a>
+                </div>
+            </div>
+        <% } %>
+    </div>
+</div> 

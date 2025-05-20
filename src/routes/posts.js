@@ -225,4 +225,50 @@ router.delete('/:id', auth, async (req, res) => {
   }
 });
 
+/**
+ * @swagger
+ * /api/posts/{id}/delete:
+ *   get:
+ *     summary: Delete a post using GET request
+ *     tags: [Posts]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema: { type: integer }
+ *       - in: query
+ *         name: confirm
+ *         required: true
+ *         schema: { type: string }
+ *     responses:
+ *       200: { description: Post deleted successfully }
+ *       401: { description: Not authorized }
+ *       403: { description: Not authorized to delete }
+ *       404: { description: Post not found }
+ */
+router.get('/:id/delete', auth, async (req, res) => {
+  try {
+    // Check if confirm parameter is present
+    if (!req.query.confirm) {
+      return res.status(400).json({ message: 'Please provide confirm parameter' });
+    }
+
+    const post = await Post.findByPk(req.params.id);
+    if (!post) {
+      return res.status(404).json({ message: 'Post not found' });
+    }
+
+    if (post.user_id !== req.user.id) {
+      return res.status(403).json({ message: 'Not authorized to delete this post' });
+    }
+
+    await post.destroy();
+    res.json({ message: 'Post deleted successfully' });
+  } catch (error) {
+    res.status(500).json({ message: 'Error deleting post', error: error.message });
+  }
+});
+
 module.exports = router; 

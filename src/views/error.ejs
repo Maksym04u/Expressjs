@@ -1,0 +1,16 @@
+<div class="row justify-content-center">
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-body text-center">
+                <h1 class="display-1 text-danger">Oops!</h1>
+                <h2 class="mb-4"><%= message %></h2>
+                <% if (error && error.stack) { %>
+                    <div class="alert alert-danger text-start">
+                        <pre class="mb-0"><%= error.stack %></pre>
+                    </div>
+                <% } %>
+                <a href="/" class="btn btn-primary">Go Home</a>
+            </div>
+        </div>
+    </div>
+</div> 
