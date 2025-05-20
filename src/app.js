@@ -9,6 +9,7 @@ const authRoutes = require('./routes/auth');
 const postRoutes = require('./routes/posts');
 const rawSqlRoutes = require('./routes/raw-sql');
 const viewRoutes = require('./routes/views');
+const auth = require('./middleware/auth');
 
 const app = express();
 
@@ -37,6 +38,14 @@ app.use('/api/raw', rawSqlRoutes);
 
 // View Routes
 app.use('/', viewRoutes);
+
+// Hello route
+app.get('/hello', auth, (req, res) => {
+    res.render('hello', { 
+        username: req.user.username,
+        title: 'Hello Page'
+    });
+});
 
 // Swagger documentation
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpecs));
