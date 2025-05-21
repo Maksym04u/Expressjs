@@ -3,6 +3,8 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const User = require('../models/User');
 const { Op } = require('sequelize');
+const { validate } = require('../middleware/validate');
+const { registerSchema, loginSchema } = require('../validators/auth');
 
 /**
  * @swagger
@@ -46,7 +48,7 @@ const { Op } = require('sequelize');
  *       400: { description: Invalid input }
  *       500: { description: Server error }
  */
-router.post('/register', async (req, res) => {
+router.post('/register', validate(registerSchema), async (req, res) => {
     try {
         const { username, email, password } = req.body;
 
@@ -116,7 +118,7 @@ router.post('/register', async (req, res) => {
  *       401: { description: Invalid credentials }
  *       500: { description: Server error }
  */
-router.post('/login', async (req, res) => {
+router.post('/login', validate(loginSchema), async (req, res) => {
     try {
         const { email, password } = req.body;
 

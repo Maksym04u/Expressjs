@@ -2,6 +2,8 @@ const router = require('express').Router();
 const Post = require('../models/Post');
 const User = require('../models/User');
 const auth = require('../middleware/auth');
+const { validate, validateQuery } = require('../middleware/validate');
+const { createPostSchema, updatePostSchema, querySchema } = require('../validators/posts');
 const { Op } = require('sequelize');
 
 /**
@@ -43,7 +45,7 @@ const { Op } = require('sequelize');
  *       401: { description: Not authorized }
  *       500: { description: Server error }
  */
-router.post('/', auth, async (req, res) => {
+router.post('/', auth, validate(createPostSchema), async (req, res) => {
   try {
     const { title, content } = req.body;
     const post = await Post.create({
@@ -75,10 +77,9 @@ router.post('/', auth, async (req, res) => {
  *       200: { description: List of posts }
  *       500: { description: Server error }
  */
-router.get('/', async (req, res) => {
+router.get('/', validateQuery(querySchema), async (req, res) => {
   try {
-    const page = parseInt(req.query.page) || 1;
-    const limit = parseInt(req.query.limit) || 5;
+    const { page, limit } = req.query;
     const offset = (page - 1) * limit;
 
     const totalPosts = await Post.count();
@@ -170,7 +171,7 @@ router.get('/:id', async (req, res) => {
  *       403: { description: Not authorized to update }
  *       404: { description: Post not found }
  */
-router.put('/:id', auth, async (req, res) => {
+router.put('/:id', auth, validate(updatePostSchema), async (req, res) => {
   try {
     const post = await Post.findByPk(req.params.id);
     if (!post) {
